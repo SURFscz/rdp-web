@@ -1,0 +1,50 @@
+<VirtualHost *:80>
+  ServerName https://__SERVER_NAME__
+
+  <Location "/">
+ 
+    MellonEnable "info"
+    MellonSecureCookie On
+    MellonMergeEnvVars On
+
+    # Metadata conf
+    MellonSPentityId "https://__SERVER_NAME__/mellon"
+    MellonSPMetadataFile __SP_XML__
+    MellonSPPrivateKeyFile __SP_KEY__
+    MellonSPCertFile __SP_CERT__
+    MellonEndpointPath /mellon
+
+    MellonVariable "portal_cookie"
+
+    # Use uids user attribute
+    MellonCond "urn:oid:0.9.2342.19200300.100.1.1" "^$" [REG,NOT]
+
+    MellonSetEnvNoPrefix "UID" "urn:oid:0.9.2342.19200300.100.1.1"
+    MellonSetEnvNoPrefix "EPPN" "urn:oid:1.3.6.1.4.1.5923.1.1.1.6"
+    MellonSetEnvNoPrefix "MAIL" "urn:oid:0.9.2342.19200300.100.1.3"
+    MellonSetEnvNoPrefix "CN" "urn:oid:2.5.4.3"
+    MellonSetEnvNoPrefix "DISPLAY_NAME" "urn:oid:2.16.840.1.113730.3.1.241"
+    MellonSetEnvNoPrefix "GN" "urn:oid:2.5.4.42"
+    MellonSetEnvNoPrefix "SN" "urn:oid:2.5.4.4"
+    MellonSetEnvNoPrefix "PRIMARY_AFFILIATION" "urn:oid:1.3.6.1.4.1.5923.1.1.1.5"
+
+    RequestHeader unset __REMOTE_USER_NAME__
+    RequestHeader set __REMOTE_USER_NAME__ %{__REMOTE_USER_VAR__}e
+
+    AuthType "Mellon"
+    Require valid-user
+    MellonEnable "auth"
+
+    PassEnv REMOTE_USER_NAME
+    PassEnv SECRETKEY
+    PassEnv URL_GUACD
+  </Location>
+
+# Keep all request to mellon endpoint here...
+  ProxyPassMatch "^/mellon" !
+  ProxyPreserveHost On
+  RewriteEngine  on
+  RewriteRule "^/favicon\.ico$" "/var/www/html/favicon.ico"
+
+  CustomLog /proc/self/fd/1 vhost_combined
+</VirtualHost>

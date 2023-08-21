@@ -1,0 +1,83 @@
+version: "2.1"
+
+volumes:
+  drive:
+    driver: local
+  record:
+    driver: local
+
+services:
+  guacd:
+    image: guacamole/guacd
+    container_name: guacd
+    volumes:
+      - drive:/drive:rw
+      - record:/record:rw
+    networks:
+      - internal
+    labels:
+      - "traefik.enable=false"
+
+  server:
+    build: server
+    container_name: server
+    networks:
+      - internal
+      - external
+    environment:
+      SECRETKEY: ${SECRETKEY}
+    links:
+      - guacd
+    expose:
+      - 8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server.rule=Host(`portal.${DOMAIN}`) && PathPrefix(`/ws`)"
+      - "traefik.http.routers.server.tls=true"
+      - "traefik.http.routers.server.tls.certresolver=le"
+      - "traefik.http.routers.server.entrypoints=https"
+      - "traefik.http.routers.server.service=server"
+      - "traefik.http.services.server.loadbalancer.server.port=8080"
+
+  client:
+    build: client
+    hostname: portal.${DOMAIN}
+    container_name: portal
+    environment:
+      DOMAIN: $DOMAIN
+      SP_HOSTNAME: portal.${DOMAIN}
+      SP_CERT: /opt/data/certs/sp.crt
+      SP_KEY: /opt/data/certs/sp.key
+      SP_XML: /opt/data/sp.xml
+      IDP_METADATA_URL: "https://proxy.sram.surf.nl/metadata/frontend.xml"
+      DISABLE_SUBJECT_CONFIRMATION: "True"
+      REMOTE_USER_VAR: UID
+      REMOTE_USER_NAME: MY_REMOTE_USER
+      URL_GUACD: portal.${DOMAIN}/ws
+      SECRETKEY: ${SECRETKEY}
+    #   logging:
+    #     driver: "none"
+    volumes:
+      - /usr/local/app/portal/etc/sp.crt:/opt/data/certs/sp.crt
+      - /usr/local/app/portal/etc/sp.key:/opt/data/certs/sp.key
+      - /usr/local/app/portal/etc/sp.xml:/opt/data/sp.xml
+    networks:
+      - internal
+      - external
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portal.rule=Host(`portal.${DOMAIN}`)"
+      - "traefik.http.routers.portal.tls=true"
+      - "traefik.http.routers.portal.tls.certresolver=le"
+      - "traefik.http.routers.portal.entrypoints=https"
+      - "traefik.http.routers.portal.service=portal"
+      - "traefik.http.routers.portal.middlewares=restricted"
+      - "traefik.http.services.portal.loadbalancer.server.port=80"
+
+networks:
+  internal:
+    external: true
+    name: localnet
+  external:
+    external: true
+    name: proxy

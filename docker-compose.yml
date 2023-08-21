@@ -1,0 +1,29 @@
+version: "2.1"
+
+volumes:
+  drive:
+    driver: local
+  record:
+    driver: local
+
+services:
+  guacd:
+    image: guacamole/guacd
+    volumes:
+      - drive:/drive:rw
+      - record:/record:rw
+
+  server:
+    build: server
+    environment:
+      SECRETKEY: ${SECRETKEY}
+    links:
+      - guacd
+    expose:
+      - 8080:8080
+
+  client:
+    restart: always
+    image: nginx
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
