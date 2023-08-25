@@ -1,0 +1,48 @@
+# vouch proxy config
+
+vouch:
+  logLevel: debug
+  testing: false
+  listen: 0.0.0.0
+  port: 9090
+  allowAllUsers: true
+  publicAccess: false
+
+  jwt:
+    maxAge: 240
+    compress: true
+
+  session:
+    name: VouchSession
+
+  cookie:
+    name: ${COOKIE_NAME}
+    secure: true
+    domain: ${DOMAIN}
+    maxAge: 14400
+    sameSite: lax
+
+  headers:
+    jwt: X-Vouch-Token # VOUCH_HEADERS_JWT
+    querystring: access_token # VOUCH_HEADERS_QUERYSTRING
+    redirect: X-Vouch-Requested-URI # VOUCH_HEADERS_REDIRECT
+    claims:
+      - uid
+#   idtoken: X-Vouch-IdP-IdToken
+    accesstoken: X-Vouch-IdP-AccessToken
+#   refreshtoken: X-Vouch-IdP-RefreshToken
+
+oauth:
+  provider: oidc
+  auth_url: ${OIDC_AUTH_URL}
+  user_info_url: ${OIDC_USER_URL}
+  token_url: ${OIDC_TOKEN_URL}
+  client_id: ${OIDC_CLIENT_ID}
+  client_secret: ${OIDC_CLIENT_SECRET}
+  callback_urls:
+    - ${OIDC_CALLBACK_URL}
+  scopes:
+    - openid
+    - profile
+    - email
+    - uid

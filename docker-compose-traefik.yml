@@ -25,7 +25,7 @@ services:
       - internal
       - external
     environment:
-      SECRETKEY: ${SECRETKEY}
+      SECRET_KEY: ${SECRET_KEY}
     links:
       - guacd
     expose:
@@ -54,7 +54,7 @@ services:
       REMOTE_USER_VAR: UID
       REMOTE_USER_NAME: MY_REMOTE_USER
       URL_GUACD: portal.${DOMAIN}/ws
-      SECRETKEY: ${SECRETKEY}
+      SECRET_KEY: ${SECRET_KEY}
     #   logging:
     #     driver: "none"
     volumes:

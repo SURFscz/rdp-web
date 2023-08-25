@@ -16,7 +16,7 @@ const clientOptions = {
 
   crypt: {
     cypher: "AES-256-CBC",
-    key: process.env.SECRETKEY,
+    key: process.env.SECRET_KEY,
   },
   allowedUnencryptedConnectionSettings: {
     rdp: ["width", "height", "dpi", "GUAC_AUDIO"],

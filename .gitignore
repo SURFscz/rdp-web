@@ -1,4 +1,4 @@
-.env
+.env*
 
 etc/sp.crt
 etc/sp.key

@@ -1,4 +1,4 @@
-version: "2.1"
+version: "3"
 
 volumes:
   drive:
@@ -12,18 +12,68 @@ services:
     volumes:
       - drive:/drive:rw
       - record:/record:rw
+    networks:
+      - internal
 
   server:
     build: server
     environment:
-      SECRETKEY: ${SECRETKEY}
+      SECRET_KEY: ${SECRET_KEY}
     links:
       - guacd
-    expose:
-      - 8080:8080
+    networks:
+      - internal
+      - external
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ws.rule=Host(`rdp-web.${DOMAIN}`) && PathPrefix(`/ws`)"
+      - "traefik.http.routers.ws.tls=true"
+      - "traefik.http.routers.ws.tls.certresolver=le"
+      - "traefik.http.routers.ws.entrypoints=https"
+      - "traefik.http.routers.ws.service=ws"
+      - "traefik.http.services.ws.loadbalancer.server.port=8080"
 
   client:
     restart: always
-    image: nginx
+    container_name: client
+    hostname: rdp-web.${DOMAIN}
+    build: nginx
+    environment:
+      DOMAIN: ${DOMAIN}
+
+      OIDC_CALLBACK_URL: https://rdp-web.${DOMAIN}/auth
+
+      OIDC_AUTH_URL: ${OIDC_AUTH_URL}
+      OIDC_USER_URL: ${OIDC_USER_URL}
+      OIDC_TOKEN_URL: ${OIDC_TOKEN_URL}
+
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+
+      COOKIE_NAME: sso_cookie
+
+      URL_GUACD: rdp-web.${DOMAIN}/ws
+
+      SECRET_KEY: ${SECRET_KEY}
     volumes:
-      - ./nginx/templates:/etc/nginx/templates:ro
+      - /usr/local/app/rdp-web/nginx/html:/var/www/html
+    networks:
+      - internal
+      - external
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.client.rule=Host(`rdp-web.${DOMAIN}`)"
+      - "traefik.http.routers.client.tls=true"
+      - "traefik.http.routers.client.tls.certresolver=le"
+      - "traefik.http.routers.client.entrypoints=https"
+      - "traefik.http.routers.client.service=client"
+      - "traefik.http.routers.client.middlewares=restricted"
+      - "traefik.http.services.client.loadbalancer.server.port=80"
+
+networks:
+  internal:
+    external: true
+    name: localnet
+  external:
+    external: true
+    name: proxy
