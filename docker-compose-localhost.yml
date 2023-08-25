@@ -9,12 +9,14 @@ volumes:
 services:
   guacd:
     image: guacamole/guacd
+    container_name: guacd
     volumes:
       - drive:/drive:rw
       - record:/record:rw
 
   server:
     build: server
+    container_name: server
     environment:
       SECRET_KEY: ${SECRET_KEY}
     links:
@@ -30,7 +32,7 @@ services:
     environment:
       DOMAIN: ${DOMAIN}
 
-      OIDC_CALLBACK_URL: https://${DOMAIN}:8443/auth
+      OIDC_CALLBACK_URL: https://${DOMAIN}/auth
 
       OIDC_AUTH_URL: ${OIDC_AUTH_URL}
       OIDC_USER_URL: ${OIDC_USER_URL}
@@ -41,10 +43,10 @@ services:
 
       COOKIE_NAME: sso_cookie
 
-      URL_GUACD: ${DOMAIN}/ws
+      URL_GUACD: ${DOMAIN}:8000/ws
 
       SECRET_KEY: ${SECRET_KEY}
     volumes:
-      - ./nginx/html:/var/www/html
+      - ./html:/var/www/html
     ports:
-      - 8443:8443
+      - 443:443
