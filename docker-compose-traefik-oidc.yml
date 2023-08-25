@@ -37,7 +37,7 @@ services:
     restart: always
     container_name: client
     hostname: rdp-web.${DOMAIN}
-    build: nginx
+    build: client-nginx-oidc
     environment:
       DOMAIN: ${DOMAIN}
 
