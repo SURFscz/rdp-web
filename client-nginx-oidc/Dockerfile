@@ -24,6 +24,5 @@ ADD vouch.yml.template /etc/
 ADD  supervisord.conf /etc/supervisor/conf.d/
 
 RUN rm -rf /var/www/html/*
-RUN echo "<?php phpinfo(); ?>" >> /var/www/html/info.php
 
 CMD ["/usr/bin/supervisord", "-n"]

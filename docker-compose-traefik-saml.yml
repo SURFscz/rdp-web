@@ -58,9 +58,10 @@ services:
     #   logging:
     #     driver: "none"
     volumes:
-      - /usr/local/app/portal/etc/sp.crt:/opt/data/certs/sp.crt
-      - /usr/local/app/portal/etc/sp.key:/opt/data/certs/sp.key
-      - /usr/local/app/portal/etc/sp.xml:/opt/data/sp.xml
+      - ./etc/sp.crt:/opt/data/certs/sp.crt
+      - ./etc/sp.key:/opt/data/certs/sp.key
+      - ./etc/sp.xml:/opt/data/sp.xml
+      - ./html:/var/www/html
     networks:
       - internal
       - external

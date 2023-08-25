@@ -56,7 +56,7 @@ services:
 
       SECRET_KEY: ${SECRET_KEY}
     volumes:
-      - /usr/local/app/rdp-web/nginx/html:/var/www/html
+      - /usr/local/app/rdp-web/html:/var/www/html
     networks:
       - internal
       - external

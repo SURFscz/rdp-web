@@ -29,6 +29,4 @@ ADD entrypoint.sh /
 
 RUN rm -rf /var/www/html/*
 
-ADD html /var/www/html
-
 CMD ["bash", "/entrypoint.sh"]
