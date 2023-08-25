@@ -1,7 +1,7 @@
 <?php
 
 $username = str_replace('"', '', $_SERVER['REMOTE_USER'] ?? "");
-$server = ($_SERVER['REQUEST_SCHEME'] ?? "http") . "://" . ($_SERVER['SERVER_NAME'] ?? "localhost");
+$server = ($_SERVER['REQUEST_SCHEME'] ?? "http") . "://" . ($_SERVER['DOMAIN'] ?? "localhost");
 
 function customError($errno, $errstr) {
     echo "<script>alert(\"$errstr\");</script>";
@@ -172,7 +172,7 @@ if (isset($_COOKIE['token'])) {
         <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
         <script type="text/javascript" src="<?php echo $server ?>/js/guacamole-common-js/all.min.js"></script>
         <script>
-            const URL = "wss://<?php echo $_SERVER['URL_GUACD']; ?>";
+            const URL = "<?php echo $_SERVER['URL_GUACD']; ?>";
             const JWT = "<?php echo base64_encode($json); ?>"
         </script>
         <script type="text/javascript" src="<?php echo $server ?>/js/client.js"></script>

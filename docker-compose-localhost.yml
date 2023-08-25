@@ -43,7 +43,7 @@ services:
 
       COOKIE_NAME: sso_cookie
 
-      URL_GUACD: ${DOMAIN}:8000/ws
+      URL_GUACD: ws://${DOMAIN}:8080
 
       SECRET_KEY: ${SECRET_KEY}
     volumes:

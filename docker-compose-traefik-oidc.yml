@@ -52,7 +52,7 @@ services:
 
       COOKIE_NAME: sso_cookie
 
-      URL_GUACD: rdp-web.${DOMAIN}/ws
+      URL_GUACD: wss://rdp-web.${DOMAIN}/ws
 
       SECRET_KEY: ${SECRET_KEY}
     volumes:
