@@ -26,9 +26,7 @@ services:
       - 8080:8080
 
   webdav:
-    build:
-      context: webdav
-      dockerfile: Dockerfile.new
+    build: webdav
     container_name: webdav
     hostname: ${DOMAIN}
     restart: always
