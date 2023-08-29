@@ -31,8 +31,9 @@ const callbacks = {
       return callback(new Error("Token expired"));
     }
 
-    settings.connection["drive-path"] = "/tmp/guacamole_" + settings.userId;
+    // settings.connection["drive-path"] = "/drive/" + settings.username;
 
+    console.info("SETTINGS: ");
     console.info(settings);
 
     callback(null, settings);

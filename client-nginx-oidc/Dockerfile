@@ -23,6 +23,14 @@ ADD vouch.conf /etc/nginx/snippets/
 ADD vouch.yml.template /etc/
 ADD  supervisord.conf /etc/supervisor/conf.d/
 
+RUN groupmod -g 1000 www-data
+RUN usermod -u 1000 www-data
+
 RUN rm -rf /var/www/html/*
+
+RUN mkdir /files
+RUN chown www-data:www-data /files
+
+VOLUME /files
 
 CMD ["/usr/bin/supervisord", "-n"]

@@ -10,6 +10,7 @@ services:
   guacd:
     image: guacamole/guacd
     container_name: guacd
+    user: ${PUID}:${PGID}
     volumes:
       - drive:/drive:rw
       - record:/record:rw
@@ -23,6 +24,21 @@ services:
       - guacd
     ports:
       - 8080:8080
+
+  webdav:
+    build:
+      context: webdav
+      dockerfile: Dockerfile.new
+    container_name: webdav
+    hostname: ${DOMAIN}
+    restart: always
+    environment:
+      LOCATION: /files
+      SERVERNAME: ${DOMAIN}
+      PUID: ${PUID}
+      PGID: ${PGID}
+    volumes:
+      - drive:/var/www/webdav:rw
 
   client:
     restart: always
@@ -48,5 +64,8 @@ services:
       SECRET_KEY: ${SECRET_KEY}
     volumes:
       - ./html:/var/www/html
+      - drive:/files
+    links:
+      - webdav
     ports:
       - 443:443

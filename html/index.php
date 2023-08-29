@@ -119,7 +119,10 @@ if (isset($_COOKIE['token'])) {
                 "security" => "any",
                 "ignore-cert" => true,
                 "disable-audio" => false,
-                "enable-audio-input" => true
+                "enable-audio-input" => true,
+                "enable-drive" => true,
+                "drive-path" => '/drive/' . $username,
+                "create-drive-path" => true
             ]
         ]
     ];
@@ -153,7 +156,7 @@ if (isset($_COOKIE['token'])) {
         'domain' =>  $_SERVER['SERVER_NAME'],
         'secure' => true,
         'httponly' => true,
-        'samesite' => 'Strict',
+        'samesite' => 'Strict'
     ]);
 }
 ?> 
