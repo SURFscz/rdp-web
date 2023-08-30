@@ -1,6 +1,21 @@
-FROM httpd:2.4.43-alpine
+ARG ALPINE_VERSION=2.4.43-alpine
+
+FROM httpd:${ALPINE_VERSION}
+
+RUN apk add --update git ca-certificates alpine-sdk apache2-dev linux-pam-dev redis autoconf automake hiredis-dev curl-dev sudo
+
+WORKDIR /usr/local/src
+
+RUN git clone https://github.com/adelton/mod_authnz_pam.git && cd mod_authnz_pam && apxs -i -a -c mod_authnz_pam.c -lpam -Wall -pedantic
+
+RUN git clone https://github.com/HarryKodden/SRAM-Token-Service.git && cd SRAM-Token-Service && make && make install
+
+FROM httpd:${ALPINE_VERSION}
 
 RUN apk --no-cache add shadow
+
+COPY --from=0 /usr/local/apache2/modules/mod_authnz_pam.so /usr/local/apache2/modules/
+COPY --from=0 /lib/security/pam_sram_validate.so /lib/security/
 
 ENV WWW_DATA daemon
 
@@ -11,9 +26,10 @@ RUN for i in dav dav_fs; do \
   sed -i -e "/^#LoadModule ${i}_module.*/s/^#//" "conf/httpd.conf"; \
   done;
 
+RUN echo "LoadModule authnz_pam_module  modules/mod_authnz_pam.so" >> conf/httpd.conf
+
 ADD default.conf conf/sites-enabled/
-RUN printf '%s\n' "Include conf/sites-enabled/*.conf" \
-  >> "conf/httpd.conf";
+RUN echo "Include conf/sites-enabled/*.conf" >> "conf/httpd.conf";
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 

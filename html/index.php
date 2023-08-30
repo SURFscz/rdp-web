@@ -108,7 +108,7 @@ if (isset($_COOKIE['token'])) {
 
     $config = [
         "connection"=>[
-            "type"=>"rdp", 
+            "type"=>"rdp",
             "settings"=>[
                 "hostname" => $host,
                 "port" => 3389,
@@ -121,6 +121,7 @@ if (isset($_COOKIE['token'])) {
                 "disable-audio" => false,
                 "enable-audio-input" => true,
                 "enable-drive" => true,
+                "drive-name" => $username,
                 "drive-path" => '/drive/' . $username,
                 "create-drive-path" => true
             ]
