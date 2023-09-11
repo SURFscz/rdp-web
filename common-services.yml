@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  guacd:
+    image: guacamole/guacd
+    container_name: guacd
+    user: ${PUID}:${PGID}
+    volumes:
+      - drive:/drive:rw
+      - record:/record:rw
+
+  server:
+    build: server
+    container_name: server
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+    links:
+      - guacd
+
+  webdav:
+    build: webdav
+    container_name: webdav
+    hostname: ${DOMAIN}
+    restart: always
+    environment:
+      LOCATION: /files
+      SERVERNAME: ${DOMAIN}
+      PUID: ${PUID}
+      PGID: ${PGID}
+    volumes:
+      - drive:/var/www/webdav:rw
+
+  client:
+    restart: always
+    container_name: client
+    hostname: ${DOMAIN}
+    build: client-nginx-oidc
+    environment:
+      DOMAIN: ${DOMAIN}
+
+      OIDC_CALLBACK_URL: https://${DOMAIN}/auth
+
+      OIDC_AUTH_URL: ${OIDC_AUTH_URL}
+      OIDC_USER_URL: ${OIDC_USER_URL}
+      OIDC_TOKEN_URL: ${OIDC_TOKEN_URL}
+
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+
+      COOKIE_NAME: sso_cookie
+
+      URL_GUACD: ws://${DOMAIN}:8080
+
+      SECRET_KEY: ${SECRET_KEY}
+    volumes:
+      - ./html:/var/www/html
+      - drive:/files
+    links:
+      - webdav

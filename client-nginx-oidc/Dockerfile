@@ -21,7 +21,7 @@ COPY server.conf /etc/nginx/sites-enabled/default
 
 ADD vouch.conf /etc/nginx/snippets/
 ADD vouch.yml.template /etc/
-ADD  supervisord.conf /etc/supervisor/conf.d/
+ADD supervisord.conf /etc/supervisor/conf.d/
 
 RUN groupmod -g 1000 www-data
 RUN usermod -u 1000 www-data

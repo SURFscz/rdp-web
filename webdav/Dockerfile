@@ -7,7 +7,6 @@ RUN apk add --update git ca-certificates alpine-sdk apache2-dev linux-pam-dev re
 WORKDIR /usr/local/src
 
 RUN git clone https://github.com/adelton/mod_authnz_pam.git && cd mod_authnz_pam && apxs -i -a -c mod_authnz_pam.c -lpam -Wall -pedantic
-
 RUN git clone https://github.com/HarryKodden/SRAM-Token-Service.git && cd SRAM-Token-Service && make && make install
 
 FROM httpd:${ALPINE_VERSION}

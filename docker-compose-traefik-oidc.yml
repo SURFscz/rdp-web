@@ -1,5 +1,6 @@
 version: "3"
 
+
 volumes:
   drive:
     driver: local
@@ -8,58 +9,59 @@ volumes:
 
 services:
   guacd:
-    image: guacamole/guacd
-    volumes:
-      - drive:/drive:rw
-      - record:/record:rw
+    extends:
+      file: common-services.yml
+      service: guacd
     networks:
       - internal
 
   server:
-    build: server
-    environment:
-      SECRET_KEY: ${SECRET_KEY}
-    links:
-      - guacd
+    extends:
+      file: common-services.yml
+      service: server
     networks:
       - internal
       - external
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ws.rule=Host(`rdp-web.${DOMAIN}`) && PathPrefix(`/ws`)"
-      - "traefik.http.routers.ws.tls=true"
-      - "traefik.http.routers.ws.tls.certresolver=le"
-      - "traefik.http.routers.ws.entrypoints=https"
-      - "traefik.http.routers.ws.service=ws"
-      - "traefik.http.services.ws.loadbalancer.server.port=8080"
+      - "traefik.http.routers.server.rule=Host(`rdp-web.${DOMAIN}`) && PathPrefix(`/ws`)"
+      - "traefik.http.routers.server.tls=true"
+      - "traefik.http.routers.server.tls.certresolver=le"
+      - "traefik.http.routers.server.entrypoints=https"
+      - "traefik.http.routers.server.service=server"
+      - "traefik.http.services.server.loadbalancer.server.port=8080"
 
-  client:
-    restart: always
-    container_name: client
-    hostname: rdp-web.${DOMAIN}
-    build: client-nginx-oidc
-    environment:
-      DOMAIN: ${DOMAIN}
-
-      OIDC_CALLBACK_URL: https://rdp-web.${DOMAIN}/auth
-
-      OIDC_AUTH_URL: ${OIDC_AUTH_URL}
-      OIDC_USER_URL: ${OIDC_USER_URL}
-      OIDC_TOKEN_URL: ${OIDC_TOKEN_URL}
-
-      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
-      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
-
-      COOKIE_NAME: sso_cookie
-
-      URL_GUACD: wss://rdp-web.${DOMAIN}/ws
-
-      SECRET_KEY: ${SECRET_KEY}
-    volumes:
-      - /usr/local/app/rdp-web/html:/var/www/html
+  webdav:
+    extends:
+      file: common-services.yml
+      service: webdav
     networks:
       - internal
       - external
+    environment:
+      DOMAIN: files.${DOMAIN}
+      LOCATION: /
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webdav.rule=Host(`files.${DOMAIN}`)"
+      - "traefik.http.routers.webdav.tls=true"
+      - "traefik.http.routers.webdav.tls.certresolver=le"
+      - "traefik.http.routers.webdav.entrypoints=https"
+      - "traefik.http.routers.webdav.service=webdav"
+      - "traefik.http.routers.webdav.middlewares=restricted@file"
+      - "traefik.http.services.webdav.loadbalancer.server.port=80"
+
+  client:
+    extends:
+      file: common-services.yml
+      service: client
+    networks:
+      - internal
+      - external
+    environment:
+      DOMAIN: rdp-web.${DOMAIN}
+      OIDC_CALLBACK_URL: https://rdp-web.${DOMAIN}/auth
+      URL_GUACD: wss://rdp-web.${DOMAIN}/ws
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.client.rule=Host(`rdp-web.${DOMAIN}`)"
@@ -67,7 +69,7 @@ services:
       - "traefik.http.routers.client.tls.certresolver=le"
       - "traefik.http.routers.client.entrypoints=https"
       - "traefik.http.routers.client.service=client"
-      - "traefik.http.routers.client.middlewares=restricted"
+      - "traefik.http.routers.client.middlewares=restricted@file"
       - "traefik.http.services.client.loadbalancer.server.port=80"
 
 networks:
