@@ -17,42 +17,55 @@ if ($username == "") {
 if (isset($_COOKIE['token'])) {
     $json = $_COOKIE['token'];
 } else {
+
     if (isset($_GET['host'])) {
         $host = $_GET['host'];
     } else {
         trigger_error("Missing Host parameter !", E_USER_WARNING);
     }
 
-    if (!isset($_POST["totp"])) { ?>
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <title>RDP-WEP</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-                <link rel="stylesheet" href="<?php echo $server ?>/css/client.css">
-            </head>
-            <body>
-                <div>
-                    <form class="modal-content animate" method="post">
-                        <div class="imgcontainer">
-                            <img src="<?php echo $server ?>/img/logo.jpeg" alt="logo" class="logo">
-                        </div>
+    if (isset($_SERVER["API_KEY"])) {
 
-                        <div class="container">
-                            <label for="totp"><b>Access Code</b></label>
-                            <input type="text" placeholder="Enter your current TOTP value" name="totp" required maxlength="6" size="6">
-                                
-                            <button type="submit" id="button">Connect</button>
-                        </div>
-                    </form>
-                </div>
-            </body>
-        </html>
-    <?php
-        exit();
+        $message = "{\"username\": \"". $username . "\"}";
+        $headers = [
+          "Content-Type: application/json",
+	  "Authorization: Bearer " . $_SERVER["API_KEY"]
+	];
+    } else {
+        if (!isset($_POST["totp"])) { ?>
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>RDP-WEP</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <link rel="stylesheet" href="<?php echo $server ?>/css/client.css">
+                </head>
+                <body>
+                    <div>
+                        <form class="modal-content animate" method="post">
+                            <div class="imgcontainer">
+                                <img src="<?php echo $server ?>/img/logo.jpeg" alt="logo" class="logo">
+                            </div>
+
+                            <div class="container">
+                                <label for="totp"><b>Access Code</b></label>
+                                <input type="text" placeholder="Enter your current TOTP value" name="totp" required maxlength="6" size="6">
+                                    
+                                <button type="submit" id="button">Connect</button>
+                            </div>
+                        </form>
+                    </div>
+                </body>
+            </html>
+        <?php
+            exit();
+        }
+
+        $message = "{\"username\": \"". $username . "\",\"code\": \"" . $_POST["totp"] . "\"\n}";
+        $headers = [
+          "Content-Type: application/json"
+	];
     }
-
-    $totp = $_POST["totp"];
 
     $curl = curl_init();
 
@@ -67,10 +80,8 @@ if (isset($_COOKIE['token'])) {
             CURLOPT_TIMEOUT => 5,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "{ \n  \"username\": \"". $username . "\",\n\t\"code\": \"" . $totp . "\"\n}",
-            CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json"
-            ],
+	    CURLOPT_POSTFIELDS => $message,
+	    CURLOPT_HTTPHEADER => $headers
         ]
     );
 
@@ -171,7 +182,6 @@ if (isset($_COOKIE['token'])) {
     </head>
     <body>
         <div id="display" style="height:100vh;">
-            <div id="connect" class="connect fa" style="font-size:100px"" />
         </div>
         <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
         <script type="text/javascript" src="<?php echo $server ?>/js/guacamole-common-js/all.min.js"></script>

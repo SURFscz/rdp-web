@@ -52,6 +52,9 @@ services:
       URL_GUACD: ws://${DOMAIN}:8080
 
       SECRET_KEY: ${SECRET_KEY}
+
+      TOTP: False
+      API_KEY: ${API_KEY}
     volumes:
       - ./html:/var/www/html
       - drive:/files

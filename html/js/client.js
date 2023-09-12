@@ -3,6 +3,25 @@ const client = new Guacamole.Client(Tunnel);
 
 var connected = false;
 
+function connect() {
+  if (!connected) {
+    let display = document.getElementById("display");
+
+    client.connect(
+      "token=" +
+        JWT +
+        "&width=" +
+        Math.round($(display).width()) +
+        "&height=" +
+        Math.round($(display).height()) +
+        "&dpi=96&" +
+        "GUAC_AUDIO=audio/L8&" +
+        "GUAC_AUDIO=audio/L16&" +
+        "GUAC_ID=SRAM RDP"
+    );
+  }
+}
+
 // Window resize...
 window.onresize = function () {
   var display = document.getElementById("display");
@@ -22,41 +41,10 @@ window.onunload = function () {
   connected = false;
 };
 
-function connect() {
-  if (!connected) {
-    let display = document.getElementById("display");
-    let connect_element = document.getElementById("connect");
-
-    document.getElementById("connect").removeEventListener("click", connect);
-
-    connect_element.classList.remove("fa-play-circle");
-
-    connect_element.classList.add("fa-refresh");
-    connect_element.classList.add("fa-pulse");
-    connect_element.classList.add("fa-3x");
-    connect_element.classList.add("fa-fw");
-
-    client.connect(
-      "token=" +
-        JWT +
-        "&width=" +
-        Math.round($(display).width()) +
-        "&height=" +
-        Math.round($(display).height()) +
-        "&dpi=96&" +
-        "GUAC_AUDIO=audio/L8&" +
-        "GUAC_AUDIO=audio/L16&" +
-        "GUAC_ID=SRAM RDP"
-    );
-  }
-}
-
-if (!connected) {
-  let connect_element = document.getElementById("connect");
-
-  connect_element.addEventListener("click", connect);
-  connect_element.classList.add("fa-play-circle");
-}
+// Connect on load
+window.onload = function() {
+  connect();
+};
 
 client.onstatechange = function clientStateChanged(state) {
   console.log("State change: " + state);
@@ -65,7 +53,6 @@ client.onstatechange = function clientStateChanged(state) {
 
     console.log("Client is connected !");
 
-    document.getElementById("connect").style.visibility = "hidden";
     document
       .getElementById("display")
       .appendChild(client.getDisplay().getElement());

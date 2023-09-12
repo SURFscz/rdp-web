@@ -129,14 +129,3 @@ span.psw {
   }
 }
 
-.connect {
-  position: absolute;
-  border: none;
-  cursor: pointer;
-  margin: 0px;
-  left: 50%;
-  top: 50%;
-  width: 100px;
-  height:100px;
-  transform: translate(-50%, -50%);
-}
