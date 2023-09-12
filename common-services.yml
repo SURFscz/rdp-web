@@ -34,7 +34,7 @@ services:
     restart: always
     container_name: client
     hostname: ${DOMAIN}
-    build: client-nginx-oidc
+    build: client
     environment:
       DOMAIN: ${DOMAIN}
 
@@ -53,7 +53,6 @@ services:
 
       SECRET_KEY: ${SECRET_KEY}
 
-      TOTP: False
       API_KEY: ${API_KEY}
     volumes:
       - ./html:/var/www/html
