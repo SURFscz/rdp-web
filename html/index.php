@@ -80,8 +80,8 @@ if (isset($_COOKIE['token'])) {
             CURLOPT_TIMEOUT => 5,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-	    CURLOPT_POSTFIELDS => $message,
-	    CURLOPT_HTTPHEADER => $headers
+	        CURLOPT_POSTFIELDS => $message,
+	        CURLOPT_HTTPHEADER => $headers
         ]
     );
 

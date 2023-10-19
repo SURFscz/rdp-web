@@ -2,26 +2,21 @@ ARG ALPINE_VERSION=2.4.43-alpine
 
 FROM httpd:${ALPINE_VERSION}
 
-RUN apk add --update git ca-certificates alpine-sdk apache2-dev linux-pam-dev redis autoconf automake hiredis-dev curl-dev sudo
+RUN apk add --update git ca-certificates alpine-sdk apache2-dev linux-pam-dev redis autoconf automake hiredis-dev curl-dev make sudo
 
 WORKDIR /usr/local/src
 
 RUN git clone https://github.com/adelton/mod_authnz_pam.git && cd mod_authnz_pam && apxs -i -a -c mod_authnz_pam.c -lpam -Wall -pedantic
 RUN git clone https://github.com/HarryKodden/SRAM-Token-Service.git && cd SRAM-Token-Service && make && make install
 
-FROM httpd:${ALPINE_VERSION}
-
-RUN apk --no-cache add shadow
-
-COPY --from=0 /usr/local/apache2/modules/mod_authnz_pam.so /usr/local/apache2/modules/
-COPY --from=0 /lib/security/pam_sram_validate.so /lib/security/
+RUN apk --no-cache add shadow rsyslog
 
 ENV WWW_DATA daemon
 
 ENV HTTPD_PREFIX /usr/local/apache2
 WORKDIR "$HTTPD_PREFIX"
 
-RUN for i in dav dav_fs; do \
+RUN for i in dav dav_fs rewrite autoindex access_compat; do \
   sed -i -e "/^#LoadModule ${i}_module.*/s/^#//" "conf/httpd.conf"; \
   done;
 

@@ -27,6 +27,10 @@ services:
       SERVERNAME: ${DOMAIN}
       PUID: ${PUID}
       PGID: ${PGID}
+      PAM_URL: ${PAM_URL}
+      PAM_REDIS: ${PAM_REDIS}
+      PAM_TOKEN: ${PAM_TOKEN}
+      PAM_ENTITLED: ${PAM_ENTITLED}
     volumes:
       - drive:/var/www/webdav:rw
 
