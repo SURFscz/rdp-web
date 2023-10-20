@@ -23,7 +23,6 @@ services:
     hostname: ${DOMAIN}
     restart: always
     environment:
-      LOCATION: /files
       SERVERNAME: ${DOMAIN}
       PUID: ${PUID}
       PGID: ${PGID}

@@ -14,8 +14,6 @@ HTTPD_PREFIX="${HTTPD_PREFIX:-/usr/local/apache2}"
 PUID=${PUID:-1000}
 PGID=${PGID:-1000}
 
-LOCATION=${LOCATION:-/}
-
 PAM_URL=${PAM_URL:-https://sram.surf.nl}
 PAM_REDIS=${PAM_REDIS:-localhost}
 PAM_TOKEN=${PAM_TOKEN:-none}
@@ -27,12 +25,6 @@ SERVERNAME=${SERVERNAME:-localhost}
 sed -e "s|Define SERVERNAME .* |Define SERVERNAME $SERVERNAME|" \
     -i "$HTTPD_PREFIX"/conf/sites-enabled/default.conf
 echo "ServerName $SERVERNAME:80" >> "$HTTPD_PREFIX"/conf/httpd.conf
-
-# Configure dav.conf
-if [ "x$LOCATION" != "x" ]; then
-    sed -e "s|Define LOCATION .*|Define LOCATION $LOCATION|" \
-        -i "$HTTPD_PREFIX/conf/sites-enabled/default.conf"
-fi
 
 usermod -u ${PUID} ${WWW_DATA}
 groupmod -g ${PGID} ${WWW_DATA}

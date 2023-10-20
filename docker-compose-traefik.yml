@@ -25,6 +25,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.server.rule=Host(`rdp-web.${DOMAIN}`) && PathPrefix(`/ws`)"
+      - "traefik.http.routers.server.priority=2"
       - "traefik.http.routers.server.tls=true"
       - "traefik.http.routers.server.tls.certresolver=le"
       - "traefik.http.routers.server.entrypoints=https"
@@ -40,11 +41,11 @@ services:
       - external
     environment:
       DOMAIN: files.${DOMAIN}
-      LOCATION: /
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.webdav.rule=Host(`files.${DOMAIN}`)"
-      - "traefik.http.routers.webdav.tls=true"
+      - "traefik.http.routers.webdav.rule=Host(`${DOMAIN}`) && PathPrefix(`/webdav`) "
+      - "traefik.http.routers.webdav.priority=2"
+      - "traefik.http.routers.webdav.tls=true)"
       - "traefik.http.routers.webdav.tls.certresolver=le"
       - "traefik.http.routers.webdav.entrypoints=https"
       - "traefik.http.routers.webdav.service=webdav"
@@ -65,6 +66,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.client.rule=Host(`rdp-web.${DOMAIN}`)"
+      - "traefik.http.routers.client.priority=1"
       - "traefik.http.routers.client.tls=true"
       - "traefik.http.routers.client.tls.certresolver=le"
       - "traefik.http.routers.client.entrypoints=https"
@@ -75,7 +77,7 @@ services:
 networks:
   internal:
     external: true
-    name: localnet
+    name: internal
   external:
     external: true
-    name: proxy
+    name: external
