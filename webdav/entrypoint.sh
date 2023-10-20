@@ -3,7 +3,6 @@ set -e
 
 # Environment variables that are used if not empty:
 #   SERVER_NAME
-#   LOCATION
 #   PUID
 #   PGID
 #   PUMASK
@@ -33,7 +32,7 @@ mkdir -p /var/www/webdav && chown "${WWW_DATA}":"${WWW_DATA}" /var/www/webdav
 mkdir -p /usr/local/apache/var/ && chown "${WWW_DATA}":"${WWW_DATA}" /usr/local/apache/var
 
 cat << EOF > /etc/pam.d/pam-service
-auth required pam_sram_validate.so debug url=${PAM_URL} token=${PAM_TOKEN} entitled=${PAM_ENTITLED} redis=${PAM_REDIS}
+auth required pam_sram_validate.so url=${PAM_URL} token=${PAM_TOKEN} entitled=${PAM_ENTITLED} redis=${PAM_REDIS}
 account sufficient pam_permit.so
 EOF
 
