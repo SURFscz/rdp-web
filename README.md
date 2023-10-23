@@ -7,6 +7,8 @@ https://www.researchgate.net/publication/355917270_Development_of_a_Concept_of_a
 
 # High level design
 
+![alt text](assets/design.png)
+
 The solution depends on following components:
 
 - Windows Server with features enabled:
@@ -17,8 +19,9 @@ The solution depends on following components:
 
 - Guacamole/Authentication proxy service
 
-The idea is that the Windows Server is may or mayt not be accessible via public internet. If it is, then users ar not able to authenticate on this service because they have no credential.
+The idea is that the Windows Server may or may not be directly accessible via public internet. If it is, then users ar not able to authenticate on this service because they have no credential.
 One reason to make this Windows Server accessible via Internet could be to allow an operator to logon for maintenance.
 The Windows Service must be accessible by the Guacamole/Authentication proxy Service.
 
-Users can make use of an RDP session via their local Web Browser and open a session via the Guacamole/Authentication proxy Service. They will have to authenticate first via OIDC with SRAM. If that succeeds, the proxy service contact the upstream Windows Service via an API call. This API request will create/update the user indentity in the Windows Server Active Directory and set a long random password on this identity. The password is returned to the proxy Service and there a guacamole websockets connection with the Windows Service is instantiated using these credentials. The credentials are never shared or visible to the user.
+Users can make use of an RDP session via their local Web Browser and open a session via the Guacamole/Authentication proxy Service. They will have to authenticate first via OIDC with SRAM. If that succeeds, the proxy service contact the upstream Windows Service via an API call. This API request will create/update the user identity in the Windows Server Active Directory and set a long random password on this identity. The password is returned to the proxy Service and there a guacamole websockets connection with the Windows Service is instantiated using these credentials. The credentials are never shared or visible to the user.
+The windows RDP session is presented to the user via a WebSockets connection.
